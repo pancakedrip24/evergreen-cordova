@@ -6,8 +6,14 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract Cordova project
+        run: |
+          tar -xzf evergreen-cordova-source.tar.gz
+          ls EvergreenApp
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,15 +30,18 @@ jobs:
         run: npm install -g cordova@12.0.0
 
       - name: Install dependencies
+        working-directory: EvergreenApp
         run: npm install
 
       - name: Add Android platform
+        working-directory: EvergreenApp
         run: cordova platform add android@12.0.1
 
       - name: Build APK
+        working-directory: EvergreenApp
         run: |
           cordova build android --release
-          cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk EvergreenCordova.apk
+          cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ../EvergreenCordova.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
